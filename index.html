@@ -929,6 +929,11 @@
         .fade-in.appear {
             opacity: 1;
             transform: translateY(0);
+            @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.7; }
+}
+</style>
         }
     </style>
 </head>
@@ -1083,15 +1088,40 @@
                     </ul>
                 </div>
                 
-                <div class="feature-card fade-in">
-                    <h3><i class="fas fa-user-secret"></i> Dark Web Scanning</h3>
-                    <ul>
-                        <li>Continuously monitors dark web forums and data dumps</li>
-                        <li>Stolen credential detection</li>
-                        <li>Threat actor monitoring</li>
-                        <li>Data breach alerts</li>
-                    </ul>
-                </div>
+               <div class="feature-card fade-in">
+    <h3><i class="fas fa-user-secret"></i> Dark Web Scanning</h3>
+    <ul>
+        <li>Continuously monitors dark web forums and data dumps</li>
+        <li>Stolen credential detection</li>
+        <li>Threat actor monitoring</li>
+        <li>Data breach alerts</li>
+    </ul>
+    
+    <!-- LIVE SCANNER ADDED HERE -->
+    <div class="live-scanner" style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(100, 255, 218, 0.1);">
+        <div class="scanner-input" style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <input type="email" id="darkWebEmail" placeholder="Enter email to scan" 
+                   style="flex: 1; padding: 10px 15px; background: rgba(10, 25, 47, 0.7); border: 1px solid rgba(100, 255, 218, 0.2); border-radius: 5px; color: var(--white); font-size: 0.9rem;">
+            <button onclick="startDarkWebScan()" 
+                    style="padding: 10px 20px; background: var(--accent); color: var(--primary); border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 0.9rem;">
+                Scan
+            </button>
+        </div>
+        
+        <div id="scanningAnimation" style="text-align: center; display: none; margin: 15px 0;">
+            <div style="display: flex; justify-content: center; gap: 6px; margin-bottom: 10px;">
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 1.5s infinite ease-in-out;"></div>
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 1.5s infinite ease-in-out; animation-delay: 0.2s;"></div>
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 1.5s infinite ease-in-out; animation-delay: 0.4s;"></div>
+            </div>
+            <p style="color: var(--accent); font-size: 0.9rem; margin: 0;">Scanning dark web databases...</p>
+        </div>
+
+        <div id="scanResults" style="display: none; padding: 15px; background: rgba(10, 25, 47, 0.5); border-radius: 5px; margin-top: 15px; font-size: 0.9rem;">
+            <!-- Results will appear here -->
+        </div>
+    </div>
+</div>
                 
                 <div class="feature-card fade-in">
                     <h3><i class="fas fa-search"></i> Digital Forensics & Investigation</h3>
@@ -1376,5 +1406,100 @@
             });
         }
     </script>
+    // Dark Web Scanner Functionality
+function startDarkWebScan() {
+    const email = document.getElementById('darkWebEmail').value;
+    const scanningAnimation = document.getElementById('scanningAnimation');
+    const scanResults = document.getElementById('scanResults');
+    
+    if (!email) {
+        alert('Please enter a valid email address');
+        return;
+    }
+    
+    // Show scanning animation
+    scanningAnimation.style.display = 'block';
+    scanResults.style.display = 'none';
+    
+    // Simulate API call (2 seconds)
+    setTimeout(() => {
+        // Sample breach database for demonstration
+        const breachDatabase = {
+            'user@example.com': {
+                breaches: 3,
+                status: 'danger',
+                details: [
+                    { name: 'SocialMedia Platform', date: 'May 2024' },
+                    { name: 'E-commerce Site', date: 'April 2024' },
+                    { name: 'Streaming Service', date: 'March 2024' }
+                ]
+            },
+            'test@test.com': {
+                breaches: 1,
+                status: 'warning',
+                details: [
+                    { name: 'Streaming Service', date: 'March 2024' }
+                ]
+            }
+        };
+        
+        let result;
+        if (breachDatabase[email]) {
+            result = breachDatabase[email];
+        } else {
+            result = {
+                breaches: 0,
+                status: 'safe',
+                details: []
+            };
+        }
+        
+        // Display results
+        let resultHTML = '';
+        if (result.breaches === 0) {
+            resultHTML = `
+                <div style="border-left: 3px solid #1dd1a1; padding-left: 12px;">
+                    <h4 style="color: #1dd1a1; margin-bottom: 8px; font-size: 1rem;">
+                        <i class="fas fa-check-circle"></i> No Breaches Found
+                    </h4>
+                    <p style="margin: 0; color: var(--light);">Your email is secure in our database.</p>
+                </div>
+            `;
+        } else {
+            const statusColor = result.status === 'danger' ? '#ff6b6b' : '#feca57';
+            const statusText = result.status === 'danger' ? 'High Risk' : 'Moderate Risk';
+            
+            resultHTML = `
+                <div style="border-left: 3px solid ${statusColor}; padding-left: 12px;">
+                    <h4 style="color: ${statusColor}; margin-bottom: 8px; font-size: 1rem;">
+                        <i class="fas fa-exclamation-triangle"></i> ${result.breaches} Breach${result.breaches > 1 ? 'es' : ''} Found
+                    </h4>
+                    <p style="margin: 0 0 10px 0; color: var(--light);">Found in:</p>
+                    <ul style="margin: 0; padding-left: 15px; color: var(--light);">
+                        ${result.details.map(breach => 
+                            `<li style="margin-bottom: 5px;">${breach.name} (${breach.date})</li>`
+                        ).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        scanResults.innerHTML = resultHTML;
+        scanningAnimation.style.display = 'none';
+        scanResults.style.display = 'block';
+    }, 2000);
+}
+
+// Allow Enter key to trigger scan
+document.addEventListener('DOMContentLoaded', function() {
+    const emailInput = document.getElementById('darkWebEmail');
+    if (emailInput) {
+        emailInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                startDarkWebScan();
+            }
+        });
+    }
+});
 </body>
 </html>
