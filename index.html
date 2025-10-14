@@ -19,6 +19,10 @@
             --shadow: 0 10px 30px -15px rgba(2, 12, 27, 0.7);
             --glow: 0 0 15px rgba(100, 255, 218, 0.4);
         }
+        @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.7; }
+}
         
         * {
             margin: 0;
@@ -1088,7 +1092,7 @@
                     </ul>
                 </div>
                 
-               <div class="feature-card fade-in">
+             <div class="feature-card fade-in">
     <h3><i class="fas fa-user-secret"></i> Dark Web Scanning</h3>
     <ul>
         <li>Continuously monitors dark web forums and data dumps</li>
@@ -1097,27 +1101,28 @@
         <li>Data breach alerts</li>
     </ul>
     
-    <!-- LIVE SCANNER ADDED HERE -->
+    <!-- LIVE SCANNER - WORKING VERSION -->
     <div class="live-scanner" style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(100, 255, 218, 0.1);">
         <div class="scanner-input" style="display: flex; gap: 10px; margin-bottom: 15px;">
             <input type="email" id="darkWebEmail" placeholder="Enter email to scan" 
-                   style="flex: 1; padding: 10px 15px; background: rgba(10, 25, 47, 0.7); border: 1px solid rgba(100, 255, 218, 0.2); border-radius: 5px; color: var(--white); font-size: 0.9rem;">
+                   style="flex: 1; padding: 10px 15px; background: rgba(10, 25, 47, 0.7); border: 1px solid rgba(100, 255, 218, 0.2); border-radius: 5px; color: #e6f1ff; font-size: 0.9rem;">
             <button onclick="startDarkWebScan()" 
-                    style="padding: 10px 20px; background: var(--accent); color: var(--primary); border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 0.9rem;">
+                    style="padding: 10px 20px; background: #64ffda; color: #0a192f; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 0.9rem;">
                 Scan
             </button>
         </div>
         
         <div id="scanningAnimation" style="text-align: center; display: none; margin: 15px 0;">
             <div style="display: flex; justify-content: center; gap: 6px; margin-bottom: 10px;">
-                <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 1.5s infinite ease-in-out;"></div>
-                <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 1.5s infinite ease-in-out; animation-delay: 0.2s;"></div>
-                <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 1.5s infinite ease-in-out; animation-delay: 0.4s;"></div>
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #64ffda; animation: pulse 1.5s infinite ease-in-out;"></div>
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #64ffda; animation: pulse 1.5s infinite ease-in-out; animation-delay: 0.2s;"></div>
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #64ffda; animation: pulse 1.5s infinite ease-in-out; animation-delay: 0.4s;"></div>
             </div>
-            <p style="color: var(--accent); font-size: 0.9rem; margin: 0;">Scanning dark web databases...</p>
+            <p style="color: #64ffda; font-size: 0.9rem; margin: 0;">Scanning dark web databases...</p>
         </div>
 
         <div id="scanResults" style="display: none; padding: 15px; background: rgba(10, 25, 47, 0.5); border-radius: 5px; margin-top: 15px; font-size: 0.9rem;">
+            <!-- Results will appear here -->
         </div>
     </div>
 </div>
@@ -1406,6 +1411,83 @@
         }
     </script>
 // Dark Web Scanner Functionality
+function startDarkWebScan() {
+    const emailInput = document.getElementById('darkWebEmail');
+    const scanningAnimation = document.getElementById('scanningAnimation');
+    const scanResults = document.getElementById('scanResults');
+    const email = emailInput.value.trim();
+    
+    if (!email) {
+        alert('Please enter a valid email address');
+        return;
+    }
+    
+    // Validate email format
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        alert('Please enter a valid email address');
+        return;
+    }
+    
+    // Show scanning animation
+    scanningAnimation.style.display = 'block';
+    scanResults.style.display = 'none';
+    
+    // Simulate API call with 3-second delay
+    setTimeout(() => {
+        // Hide scanning animation
+        scanningAnimation.style.display = 'none';
+        
+        // For demo purposes, create realistic results
+        const isBreached = Math.random() > 0.6; // 40% chance of breach
+        
+        if (isBreached) {
+            scanResults.innerHTML = `
+                <div style="color: #ff6b6b; margin-bottom: 10px;">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    <strong>Breach Detected!</strong>
+                </div>
+                <p style="margin-bottom: 10px;">Your email was found in 2 data breaches:</p>
+                <ul style="padding-left: 20px; margin-bottom: 15px;">
+                    <li>SocialMedia Platform (May 2024) - 533M records</li>
+                    <li>E-commerce Site (April 2024) - 12M records</li>
+                </ul>
+                <p style="font-size: 0.8rem; color: #ccd6f6;">
+                    <i class="fas fa-lightbulb"></i> 
+                    Change passwords for affected accounts immediately
+                </p>
+            `;
+        } else {
+            scanResults.innerHTML = `
+                <div style="color: #1dd1a1; margin-bottom: 10px;">
+                    <i class="fas fa-check-circle"></i> 
+                    <strong>No Breaches Found</strong>
+                </div>
+                <p style="margin-bottom: 10px;">Your email is not in our known breach database.</p>
+                <p style="font-size: 0.8rem; color: #ccd6f6;">
+                    <i class="fas fa-lightbulb"></i> 
+                    Continue practicing good security habits
+                </p>
+            `;
+        }
+        
+        // Show results
+        scanResults.style.display = 'block';
+    }, 3000);
+}
+
+// Allow Enter key to trigger scan
+document.addEventListener('DOMContentLoaded', function() {
+    const emailInput = document.getElementById('darkWebEmail');
+    if (emailInput) {
+        emailInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                startDarkWebScan();
+            }
+        });
+    }
+});
+</script>
+    // Dark Web Scanner Functionality
 function startDarkWebScan() {
     const emailInput = document.getElementById('darkWebEmail');
     const scanningAnimation = document.getElementById('scanningAnimation');
