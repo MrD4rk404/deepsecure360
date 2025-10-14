@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Web Scanner - DeepSecure360</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0a192f;
+            --secondary: #112240;
+            --accent: #64ffda;
+            --light: #ccd6f6;
+            --text: #8892b0;
+            --white: #e6f1ff;
+            --danger: #ff6b6b;
+            --warning: #feca57;
+            --success: #1dd1a1;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--primary);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(17, 34, 64, 0.3) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(17, 34, 64, 0.3) 0%, transparent 20%);
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+        
+        .logo-icon i {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+        
+        .logo-text {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        
+        .logo-text span {
+            color: var(--white);
+        }
+        
+        .scanner-card {
+            background: var(--secondary);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(2, 12, 27, 0.5);
+            border: 1px solid rgba(100, 255, 218, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .scanner-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .scanner-header h1 {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+        
+        .scanner-header p {
+            font-size: 1.2rem;
+            color: var(--light);
+        }
+        
+        .input-group {
+            display: flex;
+            margin-bottom: 30px;
+        }
+        
+        .input-group input {
+            flex: 1;
+            padding: 15px 20px;
+            background: rgba(10, 25, 47, 0.7);
+            border: 1px solid rgba(100, 255, 218, 0.2);
+            border-radius: 8px 0 0 8px;
+            color: var(--white);
+            font-size: 1rem;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.2);
+        }
+        
+        .input-group button {
+            background: var(--accent);
+            color: var(--primary);
+            border: none;
+            padding: 0 30px;
+            border-radius: 0 8px 8px 0;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group button:hover {
+            background: var(--success);
+        }
+        
+        .input-group button:disabled {
+            background: var(--text);
+            cursor: not-allowed;
+        }
+        
+        .scanning-animation {
+            text-align: center;
+            margin: 30px 0;
+            display: none;
+        }
+        
+        .scanning-dots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+        
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+        }
+        
+        .results {
+            display: none;
+            margin-top: 40px;
+        }
+        
+        .results-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .results-header h2 {
+            font-size: 2rem;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+        
+        .result-card {
+            background: rgba(10, 25, 47, 0.5);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .result-card h3 {
+            color: var(--white);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .result-card h3 i {
+            margin-right: 10px;
+            color: var(--accent);
+        }
+        
+        .status-safe {
+            color: var(--success);
+            font-weight: bold;
+        }
+        
+        .status-warning {
+            color: var(--warning);
+            font-weight: bold;
+        }
+        
+        .status-danger {
+            color: var(--danger);
+            font-weight: bold;
+        }
+        
+        .breach-list {
+            list-style-type: none;
+            margin-top: 15px;
+        }
+        
+        .breach-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .breach-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .breach-name {
+            color: var(--white);
+        }
+        
+        .breach-date {
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background: var(--success);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.3);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(100, 255, 218, 0.1);
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .feature-card {
+            background: var(--secondary);
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            border: 1px solid rgba(100, 255, 218, 0.05);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(100, 255, 218, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            color: var(--accent);
+            font-size: 1.5rem;
+        }
+        
+        .feature-card h3 {
+            color: var(--white);
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 40px;
+        }
+        
+        .back-link a {
+            color: var(--accent);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .input-group input {
+                border-radius: 8px;
+                margin-bottom: 10px;
+            }
+            
+            .input-group button {
+                border-radius: 8px;
+                padding: 15px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .scanner-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="logo-text">DeepSecure<span>360</span></div>
+            </div>
+            <h1>Dark Web Scanner</h1>
+            <p>Check if your credentials have been exposed in data breaches</p>
+        </header>
+
+        <div class="scanner-card">
+            <div class="scanner-header">
+                <h2>Scan for Data Breaches</h2>
+                <p>Enter your email address to check if it appears in known data breaches</p>
+            </div>
+
+            <div class="input-group">
+                <input type="email" id="emailInput" placeholder="Enter your email address" value="Ibrahimisahiman7874@gmail.com">
+                <button id="scanButton">Scan Now</button>
+            </div>
+
+            <div class="scanning-animation" id="scanningAnimation">
+                <div class="scanning-dots">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                <p>Scanning dark web databases for your information...</p>
+            </div>
+
+            <div class="results" id="resultsSection">
+                <div class="results-header">
+                    <h2>Scan Results</h2>
+                    <p id="resultSummary">Your email appears in <span id="breachCount">0</span> data breaches</p>
+                </div>
+
+                <div class="result-card">
+                    <h3><i class="fas fa-shield-alt"></i> Security Status</h3>
+                    <p id="securityStatus" class="status-safe">No breaches found</p>
+                    <p>Based on our scan of known data breaches</p>
+                </div>
+
+                <div class="result-card">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Breach Details</h3>
+                    <p>Data breaches where your email was found:</p>
+                    <ul class="breach-list" id="breachList">
+                        <!-- Breach items will be added here by JavaScript -->
+                    </ul>
+                </div>
+
+                <div class="result-card">
+                    <h3><i class="fas fa-lightbulb"></i> Recommendations</h3>
+                    <p>Based on your scan results, we recommend:</p>
+                    <ul class="breach-list" id="recommendationsList">
+                        <li>Continue using strong, unique passwords</li>
+                        <li>Enable two-factor authentication where available</li>
+                        <li>Monitor your accounts for suspicious activity</li>
+                    </ul>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="monitorButton">Enable Continuous Monitoring</button>
+                    <button class="btn btn-secondary" id="newScanButton">Perform New Scan</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-user-secret"></i>
+                </div>
+                <h3>Dark Web Monitoring</h3>
+                <p>Continuously monitors dark web forums and data dumps</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-id-card"></i>
+                </div>
+                <h3>Stolen Credential Detection</h3>
+                <p>Identifies if your credentials appear in stolen data</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-binoculars"></i>
+                </div>
+                <h3>Threat Actor Monitoring</h3>
+                <p>Tracks known threat actors and their activities</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <h3>Data Breach Alerts</h3>
+                <p>Instant notifications when new breaches are detected</p>
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a href="index.html"><i class="fas fa-arrow-left"></i> Back to Main Website</a>
+        </div>
+    </div>
+
+    <script>
+        // Dark Web Scanner Functionality
+        function startDarkWebScan() {
+            const emailInput = document.getElementById('emailInput');
+            const scanningAnimation = document.getElementById('scanningAnimation');
+            const scanResults = document.getElementById('resultsSection');
+            const email = emailInput.value.trim();
+            
+            // Validate email input
+            if (!email) {
+                alert("Please enter a valid email address");
+                return;
+            }
+            
+            // Validate email format
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                alert("Please enter a valid email address");
+                return;
+            }
+            
+            // Show scanning animation
+            scanningAnimation.style.display = 'block';
+            scanResults.style.display = 'none';
+            
+            // Simulate API call with 3-second delay
+            setTimeout(() => {
+                // Hide scanning animation
+                scanningAnimation.style.display = 'none';
+                
+                // For demo purposes, create realistic results
+                const isBreached = Math.random() > 0.6; // 40% chance of breach
+                
+                if (isBreached) {
+                    document.getElementById('breachCount').textContent = '2';
+                    document.getElementById('securityStatus').textContent = '2 breaches found';
+                    document.getElementById('securityStatus').className = 'status-danger';
+                    document.getElementById('resultSummary').textContent = 'Your email appears in 2 data breaches';
+                    
+                    // Update breach list
+                    const breachList = document.getElementById('breachList');
+                    breachList.innerHTML = `
+                        <li>
+                            <span class="breach-name">SocialMedia Platform (May 2024)</span>
+                            <span class="breach-date">533M records</span>
+                        </li>
+                        <li>
+                            <span class="breach-name">E-commerce Site (April 2024)</span>
+                            <span class="breach-date">12M records</span>
+                        </li>
+                    `;
+                    
+                    // Update recommendations
+                    const recommendationsList = document.getElementById('recommendationsList');
+                    recommendationsList.innerHTML = `
+                        <li>Change passwords for affected accounts immediately</li>
+                        <li>Enable two-factor authentication on all services</li>
+                        <li>Monitor financial statements for suspicious activity</li>
+                        <li>Consider using a password manager</li>
+                    `;
+                } else {
+                    document.getElementById('breachCount').textContent = '0';
+                    document.getElementById('securityStatus').textContent = 'No breaches found';
+                    document.getElementById('securityStatus').className = 'status-safe';
+                    document.getElementById('resultSummary').textContent = 'Your email has not been found in any known data breaches';
+                    
+                    // Update breach list
+                    const breachList = document.getElementById('breachList');
+                    breachList.innerHTML = `
+                        <li>No breaches found in our database</li>
+                    `;
+                    
+                    // Update recommendations
+                    const recommendationsList = document.getElementById('recommendationsList');
+                    recommendationsList.innerHTML = `
+                        <li>Continue using strong, unique passwords</li>
+                        <li>Enable two-factor authentication where available</li>
+                        <li>Monitor your accounts for suspicious activity</li>
+                        <li>Consider using a password manager</li>
+                    `;
+                }
+                
+                // Show results
+                scanResults.style.display = 'block';
+            }, 3000);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const scanButton = document.getElementById('scanButton');
+            const emailInput = document.getElementById('emailInput');
+            const monitorButton = document.getElementById('monitorButton');
+            const newScanButton = document.getElementById('newScanButton');
+            
+            // Scan button click event
+            scanButton.addEventListener('click', startDarkWebScan);
+            
+            // Monitor button click event
+            monitorButton.addEventListener('click', function() {
+                const email = emailInput.value.trim();
+                if (!email) {
+                    alert('Please enter an email address first');
+                    return;
+                }
+                alert(`Continuous monitoring would be enabled for ${email}. In a real implementation, this would connect to our backend monitoring services.`);
+            });
+            
+            // New scan button click event
+            newScanButton.addEventListener('click', function() {
+                emailInput.value = '';
+                document.getElementById('resultsSection').style.display = 'none';
+                document.getElementById('scanningAnimation').style.display = 'none';
+            });
+            
+            // Allow Enter key to trigger scan
+            emailInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    startDarkWebScan();
+                }
+            });
+            
+            // Auto-scan the demo email on page load
+            setTimeout(() => {
+                if (emailInput.value) {
+                    startDarkWebScan();
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
