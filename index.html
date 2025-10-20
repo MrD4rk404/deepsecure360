@@ -1431,39 +1431,67 @@
     }
 });
        
-        // Enhanced Form Submission
+       <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Smooth scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+
+    // Fade-in animation
+    const faders = document.querySelectorAll('.fade-in');
+    const appearOnScroll = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('appear');
+            observer.unobserve(entry.target);
+        });
+    }, { threshold: 0.15 });
+
+    faders.forEach(fader => appearOnScroll.observe(fader));
+
+    // Header scroll effect
+    window.addEventListener('scroll', () => {
+        const header = document.querySelector('header');
+        if (window.scrollY > 100) {
+            header.style.padding = '10px 10%';
+            header.style.boxShadow = '0 5px 20px rgba(2, 12, 27, 0.7)';
+        } else {
+            header.style.padding = '20px 10%';
+            header.style.boxShadow = 'none';
+        }
+    });
+
+    // Form submission handler
     const form = document.querySelector('form');
-    
-    if(form) {
+    if (form) {
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
-            
             const submitBtn = this.querySelector('.submit-btn');
             const originalText = submitBtn.textContent;
-            
-            // Show loading state
             submitBtn.textContent = 'Sending...';
             submitBtn.disabled = true;
-            
+
             const formData = {
                 name: document.getElementById('name').value,
                 email: document.getElementById('email').value,
                 company: document.getElementById('company').value,
                 message: document.getElementById('message').value
             };
-            
+
             try {
                 const response = await fetch('process-form.php', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
                 });
-                
+
                 const result = await response.json();
-                
                 if (response.ok && result.success) {
                     showNotification(result.message, 'success');
                     form.reset();
@@ -1471,33 +1499,34 @@ document.addEventListener('DOMContentLoaded', function() {
                     throw new Error(result.error || 'Failed to send message');
                 }
             } catch (error) {
-                console.error('Form submission error:', error);
-                showNotification(error.message || 'Error submitting form. Please try again or email us directly.', 'error');
+                showNotification(error.message || 'Error submitting form.', 'error');
             } finally {
-                // Reset button
                 submitBtn.textContent = originalText;
                 submitBtn.disabled = false;
             }
         });
     }
-});
 
-// Notification System
-function showNotification(message, type = 'info') {
-    // Remove existing notifications
-    const existingNotifications = document.querySelectorAll('.notification');
-    existingNotifications.forEach(notification => notification.remove());
-    
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
-            <span>${message}</span>
-        </div>
-        <button class="notification-close">&times;</button>
-    `;
-    
+    // Notification system
+    function showNotification(message, type = 'info') {
+        const existing = document.querySelectorAll('.notification');
+        existing.forEach(n => n.remove());
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+                <span>${message}</span>
+            </div>
+            <button class="notification-close">&times;</button>
+        `;
+        document.body.appendChild(notification);
+        notification.querySelector('.notification-close').addEventListener('click', () => notification.remove());
+        setTimeout(() => notification.remove(), 5000);
+    }
+});
+</script>
+
     </script>
 
 </body>
