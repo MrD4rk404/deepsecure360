@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Forensics Tool - DeepSecure360</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0a192f;
+            --secondary: #112240;
+            --accent: #64ffda;
+            --accent-dark: #52d9b8;
+            --light: #ccd6f6;
+            --text: #8892b0;
+            --white: #e6f1ff;
+            --danger: #ff6b6b;
+            --warning: #ff9e64;
+            --success: #64ffda;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--primary);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: var(--secondary);
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            color: var(--accent);
+            font-weight: 700;
+            text-decoration: none;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 20px;
+            background: var(--secondary);
+            color: var(--accent);
+            text-decoration: none;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid var(--accent);
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            background: rgba(100, 255, 218, 0.1);
+        }
+        
+        .forensic-dashboard {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .tools-sidebar {
+            background: var(--secondary);
+            border-radius: 10px;
+            padding: 20px;
+            height: fit-content;
+        }
+        
+        .tool-category {
+            margin-bottom: 30px;
+        }
+        
+        .tool-category h3 {
+            color: var(--accent);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(100, 255, 218, 0.2);
+        }
+        
+        .tool-item {
+            background: rgba(10, 25, 47, 0.5);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .tool-item:hover {
+            background: rgba(10, 25, 47, 0.8);
+            border-left-color: var(--accent);
+        }
+        
+        .tool-item.active {
+            background: rgba(10, 25, 47, 0.8);
+            border-left-color: var(--accent);
+        }
+        
+        .tool-item i {
+            margin-right: 10px;
+            color: var(--accent);
+        }
+        
+        .analysis-area {
+            background: var(--secondary);
+            border-radius: 10px;
+            padding: 30px;
+            min-height: 600px;
+        }
+        
+        .tool-interface {
+            display: none;
+        }
+        
+        .tool-interface.active {
+            display: block;
+        }
+        
+        .upload-area {
+            border: 2px dashed var(--accent);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            background: rgba(100, 255, 218, 0.05);
+        }
+        
+        .upload-area i {
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .upload-btn {
+            background: var(--accent);
+            color: var(--primary);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px;
+        }
+        
+        .analyze-btn {
+            background: var(--warning);
+            color: var(--primary);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px;
+        }
+        
+        .results-area {
+            margin-top: 30px;
+            background: rgba(10, 25, 47, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .result-item {
+            background: rgba(17, 34, 64, 0.7);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 3px solid var(--accent);
+        }
+        
+        .result-item.warning {
+            border-left-color: var(--warning);
+        }
+        
+        .result-item.danger {
+            border-left-color: var(--danger);
+        }
+        
+        .hash-display {
+            font-family: 'Roboto Mono', monospace;
+            background: var(--primary);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            word-break: break-all;
+            font-size: 0.9rem;
+        }
+        
+        .metadata-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .metadata-table th,
+        .metadata-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+        }
+        
+        .metadata-table th {
+            color: var(--accent);
+            font-weight: 500;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: var(--primary);
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .hex-viewer {
+            font-family: 'Roboto Mono', monospace;
+            background: var(--primary);
+            padding: 15px;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow: auto;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+        
+        .address {
+            color: var(--accent);
+        }
+        
+        .byte {
+            color: var(--light);
+        }
+        
+        .ascii {
+            color: var(--text);
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            background: rgba(10, 25, 47, 0.5);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 3px solid var(--accent);
+        }
+        
+        .timestamp {
+            color: var(--accent);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .activity {
+            color: var(--light);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-shield-alt"></i>
+                DeepSecure360 Forensics
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+        <a href="index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Home
+        </a>
+        
+        <h1 style="color: var(--accent); margin-bottom: 10px;">Digital Forensics Laboratory</h1>
+        <p style="margin-bottom: 30px;">Advanced forensic analysis tools for digital evidence collection and examination</p>
+        
+        <div class="forensic-dashboard">
+            <!-- Tools Sidebar -->
+            <div class="tools-sidebar">
+                <div class="tool-category">
+                    <h3><i class="fas fa-file"></i> File Analysis</h3>
+                    <div class="tool-item active" data-tool="hash-analysis">
+                        <i class="fas fa-fingerprint"></i> Hash Analysis
+                    </div>
+                    <div class="tool-item" data-tool="metadata-analysis">
+                        <i class="fas fa-info-circle"></i> Metadata Extraction
+                    </div>
+                    <div class="tool-item" data-tool="hex-viewer">
+                        <i class="fas fa-code"></i> Hex Viewer
+                    </div>
+                </div>
+                
+                <div class="tool-category">
+                    <h3><i class="fas fa-network-wired"></i> Network Analysis</h3>
+                    <div class="tool-item" data-tool="packet-analysis">
+                        <i class="fas fa-stream"></i> Packet Analysis
+                    </div>
+                    <div class="tool-item" data-tool="log-analysis">
+                        <i class="fas fa-clipboard-list"></i> Log Analysis
+                    </div>
+                </div>
+                
+                <div class="tool-category">
+                    <h3><i class="fas fa-user-secret"></i> Malware Analysis</h3>
+                    <div class="tool-item" data-tool="string-analysis">
+                        <i class="fas fa-text-width"></i> String Extraction
+                    </div>
+                    <div class="tool-item" data-tool="entropy-analysis">
+                        <i class="fas fa-chart-bar"></i> Entropy Analysis
+                    </div>
+                </div>
+                
+                <div class="tool-category">
+                    <h3><i class="fas fa-history"></i> Timeline Analysis</h3>
+                    <div class="tool-item" data-tool="timeline-analysis">
+                        <i class="fas fa-clock"></i> Event Timeline
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Analysis Area -->
+            <div class="analysis-area">
+                <!-- Hash Analysis Tool -->
+                <div class="tool-interface active" id="hash-analysis">
+                    <h2><i class="fas fa-fingerprint"></i> Cryptographic Hash Analysis</h2>
+                    <p>Calculate MD5, SHA-1, SHA-256, and SHA-512 hashes for file integrity verification</p>
+                    
+                    <div class="upload-area" id="hash-upload-area">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h3>Upload File for Hash Analysis</h3>
+                        <p>Drag & drop or click to select a file</p>
+                        <input type="file" class="file-input" id="hash-file">
+                        <button class="upload-btn" onclick="document.getElementById('hash-file').click()">
+                            Select File
+                        </button>
+                    </div>
+                    
+                    <div class="results-area" id="hash-results" style="display: none;">
+                        <h3>Hash Results</h3>
+                        <div id="hash-content"></div>
+                    </div>
+                </div>
+                
+                <!-- Metadata Analysis Tool -->
+                <div class="tool-interface" id="metadata-analysis">
+                    <h2><i class="fas fa-info-circle"></i> Metadata Extraction</h2>
+                    <p>Extract and analyze file metadata including EXIF data, creation dates, and technical details</p>
+                    
+                    <div class="upload-area" id="metadata-upload-area">
+                        <i class="fas fa-file-image"></i>
+                        <h3>Upload File for Metadata Analysis</h3>
+                        <p>Supports images, documents, and various file types</p>
+                        <input type="file" class="file-input" id="metadata-file">
+                        <button class="upload-btn" onclick="document.getElementById('metadata-file').click()">
+                            Select File
+                        </button>
+                    </div>
+                    
+                    <div class="results-area" id="metadata-results" style="display: none;">
+                        <h3>Metadata Results</h3>
+                        <div id="metadata-content"></div>
+                    </div>
+                </div>
+                
+                <!-- Hex Viewer Tool -->
+                <div class="tool-interface" id="hex-viewer">
+                    <h2><i class="fas fa-code"></i> Hexadecimal File Viewer</h2>
+                    <p>Examine file contents in hexadecimal format with ASCII representation</p>
+                    
+                    <div class="upload-area" id="hex-upload-area">
+                        <i class="fas fa-file-code"></i>
+                        <h3>Upload File for Hex Analysis</h3>
+                        <p>View raw binary data and file structure</p>
+                        <input type="file" class="file-input" id="hex-file">
+                        <button class="upload-btn" onclick="document.getElementById('hex-file').click()">
+                            Select File
+                        </button>
+                    </div>
+                    
+                    <div class="results-area" id="hex-results" style="display: none;">
+                        <h3>Hex Dump</h3>
+                        <div class="hex-viewer" id="hex-content"></div>
+                    </div>
+                </div>
+                
+                <!-- String Extraction Tool -->
+                <div class="tool-interface" id="string-analysis">
+                    <h2><i class="fas fa-text-width"></i> String Extraction</h2>
+                    <p>Extract human-readable strings from binary files for malware analysis</p>
+                    
+                    <div class="upload-area" id="string-upload-area">
+                        <i class="fas fa-align-left"></i>
+                        <h3>Upload File for String Analysis</h3>
+                        <p>Extract printable characters from executable and binary files</p>
+                        <input type="file" class="file-input" id="string-file">
+                        <button class="upload-btn" onclick="document.getElementById('string-file').click()">
+                            Select File
+                        </button>
+                    </div>
+                    
+                    <div class="results-area" id="string-results" style="display: none;">
+                        <h3>Extracted Strings</h3>
+                        <div id="string-content"></div>
+                    </div>
+                </div>
+                
+                <!-- Timeline Analysis Tool -->
+                <div class="tool-interface" id="timeline-analysis">
+                    <h2><i class="fas fa-clock"></i> Forensic Timeline Analysis</h2>
+                    <p>Reconstruct event timelines from system logs and file metadata</p>
+                    
+                    <div class="upload-area">
+                        <i class="fas fa-history"></i>
+                        <h3>Timeline Generator</h3>
+                        <p>Generate forensic timeline from uploaded log files</p>
+                        <input type="file" class="file-input" id="timeline-file" accept=".log,.txt,.csv">
+                        <button class="upload-btn" onclick="document.getElementById('timeline-file').click()">
+                            Upload Log File
+                        </button>
+                        <button class="analyze-btn" onclick="generateSampleTimeline()">
+                            Generate Sample Timeline
+                        </button>
+                    </div>
+                    
+                    <div class="results-area">
+                        <h3>Forensic Timeline</h3>
+                        <div class="timeline" id="timeline-content">
+                            <!-- Timeline will be generated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tool Navigation
+        document.querySelectorAll('.tool-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all items
+                document.querySelectorAll('.tool-item').forEach(i => i.classList.remove('active'));
+                // Hide all tool interfaces
+                document.querySelectorAll('.tool-interface').forEach(i => i.classList.remove('active'));
+                
+                // Add active class to clicked item
+                this.classList.add('active');
+                // Show corresponding tool interface
+                const toolId = this.getAttribute('data-tool');
+                document.getElementById(toolId).classList.add('active');
+            });
+        });
+
+        // File upload handlers
+        document.getElementById('hash-file').addEventListener('change', handleHashAnalysis);
+        document.getElementById('metadata-file').addEventListener('change', handleMetadataAnalysis);
+        document.getElementById('hex-file').addEventListener('change', handleHexAnalysis);
+        document.getElementById('string-file').addEventListener('change', handleStringAnalysis);
+
+        // Hash Analysis Function
+        async function handleHashAnalysis(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            showProgress('hash-upload-area', 'Analyzing file...');
+            
+            // Simulate processing delay
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            const hashes = await calculateFileHashes(file);
+            
+            document.getElementById('hash-results').style.display = 'block';
+            document.getElementById('hash-content').innerHTML = `
+                <div class="result-item">
+                    <h4>File Information</h4>
+                    <table class="metadata-table">
+                        <tr><th>Filename:</th><td>${file.name}</td></tr>
+                        <tr><th>Size:</th><td>${formatFileSize(file.size)}</td></tr>
+                        <tr><th>Type:</th><td>${file.type || 'Unknown'}</td></tr>
+                    </table>
+                </div>
+                <div class="result-item">
+                    <h4>Cryptographic Hashes</h4>
+                    <p><strong>MD5:</strong></p>
+                    <div class="hash-display">${hashes.md5}</div>
+                    <p><strong>SHA-1:</strong></p>
+                    <div class="hash-display">${hashes.sha1}</div>
+                    <p><strong>SHA-256:</strong></p>
+                    <div class="hash-display">${hashes.sha256}</div>
+                    <p><strong>SHA-512:</strong></p>
+                    <div class="hash-display">${hashes.sha512}</div>
+                </div>
+            `;
+            
+            hideProgress('hash-upload-area');
+        }
+
+        // Metadata Analysis Function
+        async function handleMetadataAnalysis(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            showProgress('metadata-upload-area', 'Extracting metadata...');
+            
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            const metadata = extractFileMetadata(file);
+            
+            document.getElementById('metadata-results').style.display = 'block';
+            document.getElementById('metadata-content').innerHTML = `
+                <div class="result-item">
+                    <h4>Basic File Metadata</h4>
+                    <table class="metadata-table">
+                        ${Object.entries(metadata.basic).map(([key, value]) => 
+                            `<tr><th>${key}:</th><td>${value}</td></tr>`
+                        ).join('')}
+                    </table>
+                </div>
+                ${metadata.exif ? `
+                <div class="result-item warning">
+                    <h4>EXIF Metadata Found</h4>
+                    <table class="metadata-table">
+                        ${Object.entries(metadata.exif).map(([key, value]) => 
+                            `<tr><th>${key}:</th><td>${value}</td></tr>`
+                        ).join('')}
+                    </table>
+                </div>
+                ` : ''}
+                ${metadata.security ? `
+                <div class="result-item ${metadata.security.risk === 'high' ? 'danger' : 'warning'}">
+                    <h4>Security Analysis</h4>
+                    <p>${metadata.security.message}</p>
+                </div>
+                ` : ''}
+            `;
+            
+            hideProgress('metadata-upload-area');
+        }
+
+        // Hex Viewer Function
+        async function handleHexAnalysis(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            showProgress('hex-upload-area', 'Reading binary data...');
+            
+            const arrayBuffer = await file.arrayBuffer();
+            const uint8Array = new Uint8Array(arrayBuffer);
+            
+            document.getElementById('hex-results').style.display = 'block';
+            document.getElementById('hex-content').innerHTML = generateHexDump(uint8Array);
+            
+            hideProgress('hex-upload-area');
+        }
+
+        // String Extraction Function
+        async function handleStringAnalysis(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            showProgress('string-upload-area', 'Extracting strings...');
+            
+            const arrayBuffer = await file.arrayBuffer();
+            const uint8Array = new Uint8Array(arrayBuffer);
+            const strings = extractStrings(uint8Array);
+            
+            document.getElementById('string-results').style.display = 'block';
+            document.getElementById('string-content').innerHTML = `
+                <div class="result-item">
+                    <h4>Extracted Strings (${strings.length} found)</h4>
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        ${strings.map(str => `<div style="margin-bottom: 5px; font-family: 'Roboto Mono', monospace; font-size: 0.9rem;">${escapeHtml(str)}</div>`).join('')}
+                    </div>
+                </div>
+                ${strings.some(str => str.toLowerCase().includes('malware') || str.toLowerCase().includes('virus')) ? `
+                <div class="result-item danger">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Suspicious Strings Detected</h4>
+                    <p>Potential malware indicators found in extracted strings</p>
+                </div>
+                ` : ''}
+            `;
+            
+            hideProgress('string-upload-area');
+        }
+
+        // Utility Functions
+        async function calculateFileHashes(file) {
+            // In a real implementation, you would use the Web Crypto API
+            // For demo purposes, we'll generate simulated hashes
+            const text = file.name + file.size + file.lastModified;
+            return {
+                md5: generateSimulatedHash(text, 32),
+                sha1: generateSimulatedHash(text, 40),
+                sha256: generateSimulatedHash(text, 64),
+                sha512: generateSimulatedHash(text, 128)
+            };
+        }
+
+        function generateSimulatedHash(input, length) {
+            let hash = '';
+            const chars = '0123456789abcdef';
+            for (let i = 0; i < length; i++) {
+                hash += chars[Math.floor(Math.random() * chars.length)];
+            }
+            return hash;
+        }
+
+        function extractFileMetadata(file) {
+            const basic = {
+                'Filename': file.name,
+                'File Size': formatFileSize(file.size),
+                'MIME Type': file.type || 'Unknown',
+                'Last Modified': new Date(file.lastModified).toLocaleString(),
+                'File Extension': file.name.split('.').pop() || 'None'
+            };
+
+            // Simulate EXIF data for images
+            let exif = null;
+            if (file.type.startsWith('image/')) {
+                exif = {
+                    'Camera Model': 'Simulated Camera XYZ',
+                    'Date Taken': new Date().toLocaleString(),
+                    'GPS Coordinates': '35.6895° N, 139.6917° E',
+                    'Resolution': '1920x1080',
+                    'Software': 'Adobe Photoshop 2024'
+                };
+            }
+
+            // Security analysis
+            let security = null;
+            if (file.name.endsWith('.exe') || file.name.endsWith('.dll')) {
+                security = {
+                    risk: 'high',
+                    message: 'Executable file detected. Recommend sandbox analysis.'
+                };
+            } else if (file.size > 50 * 1024 * 1024) { // 50MB
+                security = {
+                    risk: 'medium',
+                    message: 'Large file size detected. Could contain embedded data.'
+                };
+            }
+
+            return { basic, exif, security };
+        }
+
+        function generateHexDump(uint8Array) {
+            let hexDump = '';
+            const chunkSize = 16;
+            
+            for (let i = 0; i < Math.min(uint8Array.length, 1024); i += chunkSize) {
+                // Address
+                hexDump += `<div><span class="address">${i.toString(16).padStart(8, '0')}</span>  `;
+                
+                // Hex bytes
+                let hexLine = '';
+                let asciiLine = '';
+                
+                for (let j = 0; j < chunkSize; j++) {
+                    if (i + j < uint8Array.length) {
+                        const byte = uint8Array[i + j];
+                        hexLine += `<span class="byte">${byte.toString(16).padStart(2, '0')}</span> `;
+                        asciiLine += `<span class="ascii">${byte >= 32 && byte <= 126 ? String.fromCharCode(byte) : '.'}</span>`;
+                    } else {
+                        hexLine += '   ';
+                        asciiLine += ' ';
+                    }
+                    
+                    if (j === 7) hexLine += ' ';
+                }
+                
+                hexDump += hexLine + `  <span class="ascii">${asciiLine}</span></div>`;
+            }
+            
+            if (uint8Array.length > 1024) {
+                hexDump += `<div style="color: var(--accent); text-align: center; padding: 10px;">... ${uint8Array.length - 1024} more bytes ...</div>`;
+            }
+            
+            return hexDump;
+        }
+
+        function extractStrings(uint8Array, minLength = 4) {
+            const strings = [];
+            let currentString = '';
+            
+            for (let i = 0; i < Math.min(uint8Array.length, 10000); i++) {
+                const byte = uint8Array[i];
+                // Printable ASCII range
+                if (byte >= 32 && byte <= 126) {
+                    currentString += String.fromCharCode(byte);
+                } else {
+                    if (currentString.length >= minLength) {
+                        strings.push(currentString);
+                    }
+                    currentString = '';
+                }
+            }
+            
+            // Add last string
+            if (currentString.length >= minLength) {
+                strings.push(currentString);
+            }
+            
+            return strings.slice(0, 100); // Limit to first 100 strings
+        }
+
+        function generateSampleTimeline() {
+            const events = [
+                { time: '2025-01-15 14:30:22', activity: 'User login from IP 192.168.1.100' },
+                { time: '2025-01-15 14:31:45', activity: 'File downloaded: suspicious_file.exe' },
+                { time: '2025-01-15 14:32:10', activity: 'Registry modification detected' },
+                { time: '2025-01-15 14:33:25', activity: 'Outbound connection to 45.67.89.123:443' },
+                { time: '2025-01-15 14:35:40', activity: 'Antivirus alert: Trojan.Generic detected' },
+                { time: '2025-01-15 14:36:15', activity: 'System shutdown initiated' }
+            ];
+
+            const timelineContent = document.getElementById('timeline-content');
+            timelineContent.innerHTML = events.map(event => `
+                <div class="timeline-item ${event.activity.includes('suspicious') || event.activity.includes('Trojan') ? 'warning' : ''}">
+                    <div class="timestamp">${event.time}</div>
+                    <div class="activity">${event.activity}</div>
+                </div>
+            `).join('');
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function showProgress(uploadAreaId, message) {
+            const area = document.getElementById(uploadAreaId);
+            area.innerHTML = `
+                <div style="text-align: center;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem;"></i>
+                    <h3>${message}</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function hideProgress(uploadAreaId) {
+            const area = document.getElementById(uploadAreaId);
+            area.innerHTML = `
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>Upload Complete</h3>
+                <p>Analysis finished successfully</p>
+                <button class="upload-btn" onclick="location.reload()">
+                    Analyze Another File
+                </button>
+            `;
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
