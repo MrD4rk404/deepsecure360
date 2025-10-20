@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Disallow: /process-form.php
+
+Sitemap: https://deepsecure360.com/sitemap.xml
