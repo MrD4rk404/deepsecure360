@@ -1526,7 +1526,52 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Smooth scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
 
+    // Fade-in animation
+    const faders = document.querySelectorAll('.fade-in');
+    const appearOnScroll = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('appear');
+            observer.unobserve(entry.target);
+        });
+    }, { threshold: 0.15 });
+
+    faders.forEach(fader => appearOnScroll.observe(fader));
+
+    // Header scroll effect
+    window.addEventListener('scroll', () => {
+        const header = document.querySelector('header');
+        if (window.scrollY > 100) {
+            header.style.padding = '10px 10%';
+            header.style.boxShadow = '0 5px 20px rgba(2, 12, 27, 0.7)';
+        } else {
+            header.style.padding = '20px 10%';
+            header.style.boxShadow = 'none';
+        }
+    });
+
+    // Disable real submission (GitHub Pages doesn't support PHP)
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Thank you for your message! (Form submissions are disabled on GitHub Pages)');
+            form.reset();
+        });
+    }
+});
     </script>
 
 </body>
