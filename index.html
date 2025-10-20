@@ -937,6 +937,35 @@
         }
     </style>
 </head>
+    <!-- SEO Meta Tags -->
+<meta name="description" content="DeepSecure360 - AI-powered cybersecurity platform protecting critical infrastructures with cutting-edge technology and proactive defense mechanisms.">
+<meta name="keywords" content="cybersecurity, AI security, threat detection, digital forensics, network security, deepfake detection, dark web monitoring">
+<meta name="author" content="DeepSecure360">
+<meta name="robots" content="index, follow">
+
+<!-- Open Graph Tags -->
+<meta property="og:title" content="DeepSecure360 | Intelligent Security for a Borderless World">
+<meta property="og:description" content="AI-powered cybersecurity solutions for the modern digital landscape. Protecting critical infrastructures across the globe.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://deepsecure360.com">
+<meta property="og:image" content="https://deepsecure360.com/images/og-image.jpg">
+<meta property="og:site_name" content="DeepSecure360">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="DeepSecure360 | Intelligent Security for a Borderless World">
+<meta name="twitter:description" content="AI-powered cybersecurity solutions for the modern digital landscape.">
+<meta name="twitter:image" content="https://deepsecure360.com/images/og-image.jpg">
+
+<!-- Security Headers -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:;">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="X-XSS-Protection" content="1; mode=block">
+
+<!-- Favicon -->
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <body>
     <!-- Header & Navigation -->
     <header>
@@ -1040,7 +1069,7 @@
                 <div class="feature-card fade-in">
                     <h3><i class="fas fa-brain"></i> AI-Powered Threat Detection</h3>
                     <ul>
-                        <li><a href="http://localhost:3001" target="_blank">AI Threat Detection</a></li>
+                        <a href="https://ai.deepsecure360.com" target="_blank">AI Threat Detection</a></li>
                         <li><a href="threat-detection.html">Threat Detection Demo</a></li>
                         <li>Uses ML algorithms for early warning</li>
                         <li>Real-time threat intelligence</li>
@@ -1414,15 +1443,175 @@
             }
         });
         
-        // Form submission
-        const form = document.querySelector('form');
-        if(form) {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                alert('Thank you for your request! Our team will contact you shortly.');
-                form.reset();
-            });
+    // Add actual form submission logic here
+    try {
+        const response = await fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+        
+        if (response.ok) {
+            alert('Thank you! We\'ll contact you shortly.');
+            form.reset();
         }
+    } catch (error) {
+        alert('Error submitting form. Please try again.');
+    }
+});
+       
+        // Enhanced Form Submission
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    
+    if(form) {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = this.querySelector('.submit-btn');
+            const originalText = submitBtn.textContent;
+            
+            // Show loading state
+            submitBtn.textContent = 'Sending...';
+            submitBtn.disabled = true;
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                company: document.getElementById('company').value,
+                message: document.getElementById('message').value
+            };
+            
+            try {
+                const response = await fetch('process-form.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    showNotification(result.message, 'success');
+                    form.reset();
+                } else {
+                    throw new Error(result.error || 'Failed to send message');
+                }
+            } catch (error) {
+                console.error('Form submission error:', error);
+                showNotification(error.message || 'Error submitting form. Please try again or email us directly.', 'error');
+            } finally {
+                // Reset button
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    }
+});
+
+// Notification System
+function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notification => notification.remove());
+    
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+            <span>${message}</span>
+        </div>
+        <button class="notification-close">&times;</button>
+    `;
+    
+    // Add notification styles if not already added
+    if (!document.querySelector('#notification-styles')) {
+        const styles = document.createElement('style');
+        styles.id = 'notification-styles';
+        styles.textContent = `
+            .notification {
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: var(--secondary);
+                border-left: 4px solid var(--accent);
+                color: var(--white);
+                padding: 15px 20px;
+                border-radius: 4px;
+                box-shadow: var(--shadow);
+                z-index: 10000;
+                max-width: 400px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                animation: slideInRight 0.3s ease;
+            }
+            .notification.success { 
+                border-left-color: #64ffda; 
+                background: #112240;
+            }
+            .notification.error { 
+                border-left-color: #ff6b6b; 
+                background: #112240;
+            }
+            .notification-content { 
+                display: flex; 
+                align-items: center; 
+                flex-grow: 1;
+            }
+            .notification-content i { 
+                margin-right: 10px; 
+                font-size: 1.2rem;
+            }
+            .notification-close {
+                background: none;
+                border: none;
+                color: var(--text);
+                font-size: 1.2rem;
+                cursor: pointer;
+                margin-left: 15px;
+                padding: 0;
+                width: 25px;
+                height: 25px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .notification-close:hover {
+                color: var(--white);
+            }
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(styles);
+    }
+    
+    document.body.appendChild(notification);
+    
+    // Auto remove after 5 seconds
+    const autoRemove = setTimeout(() => {
+        if (notification.parentNode) {
+            notification.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }
+    }, 5000);
+    
+    // Close button functionality
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+        clearTimeout(autoRemove);
+        notification.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    });
+}
     </script>
 
 </body>
